@@ -1,113 +1,80 @@
+"use client"
 import Image from 'next/image'
+import { useState , useRef , useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
+
+  const createFormInput = (placeholder, label) => {
+
+    const formInputElement = (<div className='p-4 flex flex-col gap-2 bg-black rounded-lg'>
+      <label>{label}</label>
+      <input type='text' placeholder={placeholder} className='border border-neutral-600 bg-neutral-950 rounded-md text-black p-2'></input>
+    </div>)
+    
+    return {id:uuidv4(),element:formInputElement}
+  
+  }
+  
+  const addFormInput = (idx) => {
+    console.log("adding==",formElements)
+    let element = createFormInput(`placeholder ${idx}`,`label ${idx}`)
+    let newformElements = [...formElements]
+    newformElements.splice(idx,0,element)
+    setFormElements(newformElements)
+  }
+
+  const removeFormInput = (idx) =>{
+    let newformElements = [...formElements]
+    newformElements.splice(idx,1)
+    setFormElements(newformElements)
+  }
+
+  const [formElements, setFormElements] = useState([createFormInput("Enter your name", "Name")])
+  const [selectedElement,setSelectedELement] = useState(null)
+  
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <main className="flex h-screen flex-col px-12 py-4 items-center gap-4">
+      <AnimatePresence>
+      {formElements.map((el,idx) => {
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+          let selected = el.id == selectedElement;
+          
+          return <motion.div 
+          layout   
+          initial={{
+            scale: 0.8,
+            y: 2,
+          }}
+          animate={{
+            scale: 1,
+            y:0
+          }}
+          exit={{
+            scale: 0.8,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.3,
+            ease: "backInOut",
+             
+          }}
+                    key={el.id} 
+                    onClick={( )=>{setSelectedELement(el.id);console.log(el.id)}} 
+                    className={`relative border rounded-lg w-full max-w-[400px] ${selected ? 'border-blue-500':'border-neutral-800'}`}>
+                    
+                    {el.element}
+                    
+                    {selected && 
+                    <div className='flex flex-col bg-neutral-950 absolute px-[4px] py-[4px] rounded-md gap-1 top-0 right-[-40px]'>
+                      <button onClick={()=>{removeFormInput(idx);console.log("remfm")}} className='bg-neutral-800 px-2 rounded-md '>-</button>
+                      <button onClick={()=>{addFormInput(idx + 1);console.log("addfm")}} className='bg-neutral-800 px-2 rounded-md'>+</button>
+                    </div>}
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+                  </motion.div>
+      })}
+      </AnimatePresence>
     </main>
   )
 }
