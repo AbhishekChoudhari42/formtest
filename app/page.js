@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {BsFillCaretDownFill,BsFillCaretUpFill} from 'react-icons/bs'
 import {AiOutlinePlus,AiOutlineMinus} from 'react-icons/ai'
 import {BiEditAlt} from 'react-icons/bi'
+import {RxCross2} from 'react-icons/rx'
+
 export default function Home() {
 
   const createFormInput = (placeholder, label) => {
@@ -19,7 +21,8 @@ export default function Home() {
   
   }
   
-  let editFormInput = (idx,placeholder,label) => {
+  const editFormInput = (placeholder,label) => {
+    let idx = selectedElement?.idx
     let newformElement = createFormInput(placeholder,label)
     let newformElements = [...formElements];
     newformElements[idx] = newformElement;
@@ -88,19 +91,48 @@ export default function Home() {
 
   return (
     <main className="flex h-screen flex-col px-12 py-4 items-center gap-4">
-    {modal && 
-      <div className='p-4 flex flex-col gap-2 bg-black rounded-lg'>
+    
+      <AnimatePresence>
+      {modal && 
+    <motion.div 
+    layout   
+    initial={{
+      opacity:0,
+      scale: 0.8,
+      y: 2,
+    }}
+    animate={{
+      opacity:1,
+      scale: 1,
+      y:0
+    }}
+    exit={{
+      opacity:0,
+      scale: 0.8,
+      y: 0,
+    }}
+    transition={{
+      duration: 0.4,
+      ease: "backInOut",
+       
+    }}
+    className='fixed z-50 w-full h-screen bg-black/70 flex justify-center items-center'>
+
+      <div className='relative p-4 flex flex-col gap-2 bg-black border border-neutral-500 rounded-lg w-full max-w-[400px] '>
+          
+          <RxCross2 onClick={()=>{setModal(false)}} className='absolute top-2 right-2' />
           <label>label</label>
           <input name="label" onChange={handleMetadataChange} type='text' className='border border-neutral-600 bg-neutral-950 rounded-md text-black p-2'></input>
           <label>placeholder</label>
           <input name="placeholder" onChange={handleMetadataChange} type='text' className='border border-neutral-600 bg-neutral-950 rounded-md text-black p-2'></input>
-          <button onClick={()=>{setModal(true);editFormInput = (1,formMetadata.placeholder,formMetadata.label)}} className='bg-neutral-800 px-2 py-2 rounded-md w-full flex justify-center items-center gap-1'><BiEditAlt/> Edit </button>
+          <button onClick={()=>{editFormInput(formMetadata.placeholder,formMetadata.label) ; setModal(false)}} className='bg-neutral-800 px-2 py-2 mt-4 rounded-md w-full flex justify-center items-center gap-1'><BiEditAlt/> Edit </button>
 
-      </div>}
-      <AnimatePresence>
+        </div>
+      </motion.div>}
+
       {formElements.map((el,idx) => {
 
-          let selected = el.id == selectedElement;
+          let selected = el.id == selectedElement?.id;
           
           return <motion.div 
           layout   
@@ -120,13 +152,12 @@ export default function Home() {
             y: 0,
           }}
           transition={{
-            duration: 0.3,
+            duration: 0.4,
             ease: "backInOut",
              
           }}
                     key={el.id} 
-                    // onHoverStart={( )=>{setSelectedELement(el.id)}}
-                    onClick={( )=>{setSelectedELement(el.id)}} 
+                    onClick={( )=>{setSelectedELement({id:el.id,idx:idx})}}                     
                     className={`relative border rounded-lg w-full max-w-[400px] ${selected ? 'border-blue-500':'border-neutral-800'}`}>
                     
                     {el.element}
